@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
-from resnet import ResNet20  # from this repo
+from resnet import ResNet  # this exists in resnet.py
 
 
 def main():
@@ -14,8 +14,8 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print("Using device:", device)
 
-    # Model: 20-layer ResNet on CIFAR-10 (10 classes)
-    model = ResNet20(num_classes=10).to(device)
+    # 20-layer ResNet for CIFAR-10 (depth=20, 10 classes)
+    model = ResNet(depth=20, num_classes=10).to(device)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=5e-4)
@@ -43,11 +43,9 @@ def main():
         if initial_loss is None:
             initial_loss = loss_value
 
-    # Sanity checks
     if not torch.isfinite(loss):
         raise AssertionError("Final loss is not finite")
 
-    # We expect at least some improvement; tolerate small noise
     if loss_value >= initial_loss * 1.1:
         raise AssertionError(
             f"Loss did not improve enough: initial={initial_loss:.4f}, final={loss_value:.4f}"
